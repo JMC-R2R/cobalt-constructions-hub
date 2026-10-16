@@ -3296,7 +3296,7 @@ function itemCard(r, staff){
             + '<button class="notebtn wpbtn" type="button" data-wpcopy="'+id+'" title="See the post and its HTML, then copy it for a WordPress Custom HTML block">View &amp; copy HTML</button>' : '')
       + (staff && ARTICLES[r.id] && li
           ? '<button class="notebtn wpbtn" type="button" data-lipack="'+id+'" title="Article ready to paste, banner, meta and promo post">LinkedIn pack</button>' : '')
-      + link(r.doc_url, '', 'Draft') + link(r.live_url, 'live', 'Live')
+      + link(r.doc_url, '', (r.stream === 'location_page' || r.stream === 'service_page') ? 'View page' : 'Draft') + link(r.live_url, 'live', 'Live')
     + '</div></div>'
     + '<div class="ticks">'
       + (isPlanned(r) && !li
