@@ -270,7 +270,16 @@
   .ad-name{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .ad-head{font-size:17px;font-weight:800;color:var(--ink-dk);line-height:1.25;margin:0}
   .ad-text{white-space:pre-wrap;font-size:14px;line-height:1.5;color:var(--ink);max-height:7.6em;overflow:hidden;position:relative}
-  .ad-text.open{max-height:none}
+  .ad-full.open .ad-text{max-height:none}
+  /* meta ad cta bar 19/11/2026: the strip under a Facebook ad, headline left, CTA button right. */
+  .ad-cta{display:none;align-items:center;gap:12px;background:#f0f2f5;border-radius:8px;padding:10px 12px;margin-top:10px}
+  .ad-full.open .ad-cta{display:flex}
+  .ad-cta-t{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+  .ad-cta-h{font-size:15px;font-weight:700;color:#050505;line-height:1.25}
+  .ad-cta-d{font-size:12.5px;color:#65676b;line-height:1.3}
+  .ad-cta-b{flex:none;background:#e4e6eb;color:#050505;font-size:14px;font-weight:700;border-radius:6px;padding:8px 14px;white-space:nowrap}
+  .ad-cta-l{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 0}
+  .ad-full.open .ad-cta-l{display:block}.ad-cta-l{display:none}
   .ad-more{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:800;color:var(--accent-ink);cursor:pointer;text-align:left}
   .ad-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .ad-meta span{font-size:12px;font-weight:800;border-radius:20px;padding:3px 10px;background:var(--soft);color:var(--ink)}
@@ -6318,8 +6327,14 @@ function adCard(r, staff){
     + '<div class="ad-body">'
       + '<span class="ad-name">'+esc(a.label || r.title)+'</span>'
       + '<p class="ad-head">'+esc(head)+'</p>'
-      + '<div class="ad-text" data-adtext="'+id+'">'+esc(text)+'</div>'
-      + (text.length > 260 ? '<button class="ad-more" type="button" data-admore="'+id+'">Read the full text</button>' : '')
+      + '<div class="ad-full" data-adtext="'+id+'">'
+        + '<div class="ad-text">'+esc(text)+'</div>'
+        + '<p class="ad-cta-l">Headline and button, as they appear under the video</p>'
+        + '<div class="ad-cta"><div class="ad-cta-t"><span class="ad-cta-h">'+esc(head)+'</span>'
+          + (descs[0] ? '<span class="ad-cta-d">'+esc(descs[0])+'</span>' : '') + '</div>'
+          + '<span class="ad-cta-b">'+esc(AD_CTA[a.cta] || 'Learn more')+'</span></div>'
+      + '</div>'
+      + '<button class="ad-more" type="button" data-admore="'+id+'">Read the full text</button>'
       + '<div class="ad-meta">'
         + '<span>'+esc(AD_CTA[a.cta] || 'Learn more')+' button</span>'
         + (a.destination ? '<span>'+esc(a.destination)+'</span>' : '')
