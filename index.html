@@ -253,6 +253,39 @@
   .b-blog{background:#eef7ee;color:var(--good)}
   .b-svc{background:#eaf3ff;color:#1663b8}
   .b-gmb{background:#fff3da;color:#a96a00}
+  /* meta ads for approval 19/11/2026: one card per Meta ad, video cover, copy, Facebook preview link. */
+  .b-ad{background:#e7efff;color:#1d4ed8}
+  .adgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin:10px 0 22px}
+  .adcard{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+  .adcard.s-done{border-color:#9fd8b8;box-shadow:0 0 0 2px #dcf3e6}
+  .adcard.s-rej{border-color:#f3b4ae;box-shadow:0 0 0 2px #fde2e0}
+  .ad-media{position:relative;display:block;background:#000;aspect-ratio:9/14;overflow:hidden}
+  .ad-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .ad-media .ad-chip{position:absolute;top:10px;left:10px;background:rgba(15,30,45,.82);color:#fff;font-size:11.5px;
+    font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:20px;padding:4px 10px}
+  .ad-media .ad-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;
+    background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;font-size:22px;color:#111;
+    box-shadow:0 4px 18px rgba(0,0,0,.35)}
+  .ad-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:9px;flex:1}
+  .ad-name{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .ad-head{font-size:17px;font-weight:800;color:var(--ink-dk);line-height:1.25;margin:0}
+  .ad-text{white-space:pre-wrap;font-size:14px;line-height:1.5;color:var(--ink);max-height:7.6em;overflow:hidden;position:relative}
+  .ad-text.open{max-height:none}
+  .ad-more{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:800;color:var(--accent-ink);cursor:pointer;text-align:left}
+  .ad-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .ad-meta span{font-size:12px;font-weight:800;border-radius:20px;padding:3px 10px;background:var(--soft);color:var(--ink)}
+  .ad-vars{border-top:1px dashed var(--line);padding-top:8px;font-size:13.5px}
+  .ad-vars summary{cursor:pointer;font-weight:800;color:var(--ink-dk)}
+  .ad-vars h5{margin:10px 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .ad-vars ol{margin:0;padding-left:20px}
+  .ad-vars li{margin:0 0 8px;white-space:pre-wrap;line-height:1.45}
+  .ad-preview{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-weight:800;font-size:14.5px;
+    border-radius:10px;padding:10px 12px;background:#1877f2;color:#fff}
+  .ad-preview:hover{background:#0f63d1}
+  .ad-hint{font-size:12px;color:var(--muted);margin:-4px 0 0;text-align:center}
+  .ad-qc{background:#fff6dd;border-left:4px solid #e8a400;border-radius:8px;padding:8px 11px;font-size:13.5px;color:var(--ink)}
+  .adcard .ticks{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px}
+
   .b-power{background:#fff8e1;color:#8a6d00}
   .b-soc{background:#f6f3ff;color:#6a4fc0}
 
@@ -2014,16 +2047,16 @@ const INTERNAL_STATUS = [['not_started','Not started'],['started','Started'],['w
                          ['almost_done','Almost done'],['done','Done']];
 const isPage = r => r.stream === 'location_page' || r.stream === 'service_page';
 const TYPE_BADGE = {blog:'b-blog', location_page:'b-loc', service_page:'b-svc', gbp:'b-gmb',
-                    social:'b-soc', linkedin:'b-soc'};
+                    social:'b-soc', linkedin:'b-soc', meta_ad:'b-ad'};
 const TYPE_LABEL = {blog:'Blog', location_page:'Location page', service_page:'Service page',
-                    gbp:'GBP post', social:'Social', linkedin:'LinkedIn'};
+                    gbp:'GBP post', social:'Social', linkedin:'LinkedIn', meta_ad:'Meta ad'};
 // Jose's order, set 14/08/2026: service pages, then location pages, then blogs,
 // then GBP. Money pages first, supporting content after. Since 17/09/2026 GBP is one
 // item per post, grouped by week, so each post is approved and owned on its own.
-const STREAM_ORDER = ['service_page','location_page','blog','gbp','social','linkedin'];
+const STREAM_ORDER = ['service_page','location_page','blog','gbp','social','linkedin','meta_ad'];
 let BATCHES = [], REQUESTS = [], ASSIGNEES = [];
 const TYPE_HEAD = {service_page:'Service Pages', location_page:'Location Pages', blog:'Blogs', gbp:'GBP Posts',
-                   social:'Social Posts', linkedin:'LinkedIn Articles'};
+                   social:'Social Posts', linkedin:'LinkedIn Articles', meta_ad:'Meta Ads'};
 const POST_TYPE = {service_question:'Service question', ai_query:'AI search question', educational:'Tip',
                    project_spotlight:'Project spotlight', inspiration:'Inspiration', client_feedback:'Client feedback'};
 const PERSON = p => p === 'jigar' ? "Jigar's team" : (p ? p.charAt(0).toUpperCase() + p.slice(1) : '?');
@@ -6011,6 +6044,7 @@ function monthBriefMarkup(t){
     body += '<div class="typehead"><span class="badge '+(TYPE_BADGE[stream]||'b-blog')+'">'
           + esc(TYPE_LABEL[stream]||stream)+'</span><h3>'+esc(TYPE_HEAD[stream]||stream)+'</h3>'
           + '<span class="tc">'+sr.length+' '+(sr.length===1?'item':'items')+'</span></div>';
+    if (stream === 'meta_ad') { body += '<div class="adgrid">' + sr.map(r => adCard(r, staff)).join('') + '</div>'; continue; }
     if (stream !== 'gbp') { for (const r of sr) body += itemCard(r, staff); continue; }
     // GBP: 3 posts a week, grouped by week so the client can approve a week in one click.
     // The pill reads wkDone, never !open. An item that is still 'started' is not approvable yet
@@ -6249,6 +6283,81 @@ function gbpClientCard(r){
     + '<button class="gapprove" type="button" data-gbpapprove="' + id + '"' + (hasCaption && !done ? '' : ' disabled')
       + '>' + (done ? 'Approved' : (hasCaption ? 'Approve post' : 'Caption to come')) + '</button>'
     + '</div>';
+}
+
+
+/* meta ads for approval 19/11/2026. One card per Meta ad: the video cover links to Meta's own preview
+   (fb.me/adspreview), and the copy is stored in the hub so the client can still read and
+   approve the ad when a preview link has expired or they are not logged in to Facebook.
+   Approve / Not approved / Notes use the same data- attributes as itemCard, so the existing
+   handlers save them and ch_log_item_event records who approved what. */
+const AD_CTA = {LEARN_MORE:'Learn more', SIGN_UP:'Sign up', CONTACT_US:'Contact us', GET_QUOTE:'Get quote',
+                APPLY_NOW:'Apply now', BOOK_TRAVEL:'Book now', SUBSCRIBE:'Subscribe'};
+function adCard(r, staff){
+  const id = esc(r.id), a = r.ad_spec || {};
+  const bodies = a.bodies || [], titles = a.titles || [], descs = a.descriptions || [];
+  const head = titles[0] || r.title, text = bodies[0] || r.post_body || '';
+  const done = !!r.approved, rej = !!r.not_approved;
+  const canTick = r.client_status !== 'started';
+  const st = esc(r.client_status);
+  const vars = (bodies.length > 1 || titles.length > 1)
+    ? '<details class="ad-vars"><summary>See all '+bodies.length+' text options and '+titles.length+' headlines</summary>'
+      + '<p style="margin:6px 0 0;color:var(--muted)">Meta tests these versions against each other and shows the best performer more often. Approving the ad approves all of them.</p>'
+      + '<h5>Primary text</h5><ol>'+bodies.map(b => '<li>'+esc(b)+'</li>').join('')+'</ol>'
+      + '<h5>Headlines</h5><ol>'+titles.map(x => '<li>'+esc(x)+'</li>').join('')+'</ol>'
+      + (descs.length ? '<h5>Description</h5><ol>'+descs.map(x => '<li>'+esc(x)+'</li>').join('')+'</ol>' : '')
+      + '</details>' : '';
+  return '<div class="adcard'+(done?' s-done':'')+(rej?' s-rej':'')+'" id="'+esc(r.anchor)+'" data-id="'+id+'">'
+    + (r.doc_url
+        ? '<a class="ad-media" href="'+esc(r.doc_url)+'" target="_blank" rel="noopener" title="Watch this ad on Facebook">'
+        : '<div class="ad-media">')
+      + (r.image_url ? '<img loading="lazy" src="'+esc(r.image_url)+'" alt="'+esc(head)+'">' : '')
+      + '<span class="ad-chip">Video ad</span>'
+      + (r.doc_url ? '<span class="ad-play" aria-hidden="true">&#9654;</span>' : '')
+    + (r.doc_url ? '</a>' : '</div>')
+    + '<div class="ad-body">'
+      + '<span class="ad-name">'+esc(a.label || r.title)+'</span>'
+      + '<p class="ad-head">'+esc(head)+'</p>'
+      + '<div class="ad-text" data-adtext="'+id+'">'+esc(text)+'</div>'
+      + (text.length > 260 ? '<button class="ad-more" type="button" data-admore="'+id+'">Read the full text</button>' : '')
+      + '<div class="ad-meta">'
+        + '<span>'+esc(AD_CTA[a.cta] || 'Learn more')+' button</span>'
+        + (a.destination ? '<span>'+esc(a.destination)+'</span>' : '')
+        + '<span class="sp '+st+'" style="margin:0">'+esc(CLIENT_STATUS[r.client_status]||r.client_status)+'</span>'
+      + '</div>'
+      + vars
+      + (staff && a.qc_flags && a.qc_flags.length
+          ? a.qc_flags.map(f => '<div class="ad-qc"><b>Team only:</b> '+esc(f)+'</div>').join('') : '')
+      + (r.doc_url
+          ? '<a class="ad-preview" href="'+esc(r.doc_url)+'" target="_blank" rel="noopener">&#9654; Watch the preview on Facebook</a>'
+            + '<p class="ad-hint">Opens in Facebook. You may need to log in to see it.</p>'
+          : '')
+      + '<div class="ticks">'
+        + '<label class="tickl"><input class="tick" type="checkbox" data-approve="'+id+'"'
+          + (done?' checked':'') + (canTick?'':' disabled')
+          + ' title="'+(canTick?'Approve this ad':'Not ready for approval yet')+'"> Approve ad</label>'
+        + '<label class="tickl no"><input class="tick" type="checkbox" data-reject="'+id+'"'
+          + (rej?' checked':'') + ' title="Tell us what needs changing"> Not approved</label>'
+      + '</div>'
+      + '<div class="rejbox'+(rej?' saved':' hide')+'" data-rejbox="'+id+'">'
+        + '<div class="rjh"><div><b>'+(rej ? 'Thanks, we have your feedback' : 'What would you like us to change?')+'</b>'
+        + '<span>'+(rej ? 'We will update this ad and come back to you before it goes live.'
+                        : 'Tell us what to adjust: the video, the wording or the headline.')+'</span></div></div>'
+        + '<textarea data-rejwhy="'+id+'" rows="3" placeholder="For example: can we use a different opening line?">'
+        + esc(r.not_approved_reason||'') + '</textarea>'
+        + '<div class="rjrow"><button class="btn rjsave" type="button" data-rejsave="'+id+'">'
+          + (rej ? 'Update feedback' : 'Send feedback') + '</button>'
+        + '<button class="btn ghost" type="button" data-rejcancel="'+id+'">'
+          + (rej ? 'Withdraw, it is fine as is' : 'Cancel') + '</button>'
+        + '<span class="rejmsg" data-rejmsg="'+id+'"></span></div>'
+      + '</div>'
+      + '<div class="actions" style="margin:0">'
+        + '<button class="notebtn" type="button" data-note="'+id+'">Notes'+(r.client_notes ? '<span class="notedot"></span>' : '')+'</button>'
+      + '</div>'
+      + '<div class="panel" id="note-'+id+'" hidden><label>Notes on this ad</label>'
+        + '<textarea class="note" style="width:100%;min-height:70px;font-size:14px" data-notefor="'+id+'" placeholder="Anything you want changed?">'
+        + esc(r.client_notes||'')+'</textarea></div>'
+    + '</div></div>';
 }
 
 function gbpCard(r, staff){
@@ -6597,6 +6706,11 @@ function wireMonthBrief(el, t){
      saved, because the CHECK constraint rejects the flag without one and a silent
      failure here would read to the client as "it saved". Ticking it also clears
      Approve content, since the two are mutually exclusive in the database. */
+  el.querySelectorAll('[data-admore]').forEach(b => b.addEventListener('click', () => {
+    const x = el.querySelector('[data-adtext="'+b.dataset.admore+'"]'); if (!x) return;
+    const open = x.classList.toggle('open'); b.textContent = open ? 'Show less' : 'Read the full text';
+  }));
+
   el.querySelectorAll('[data-reject]').forEach(cb => cb.addEventListener('change', async () => {
     const id = cb.dataset.reject;
     const box = el.querySelector('[data-rejbox="'+id+'"]');
